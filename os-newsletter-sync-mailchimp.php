@@ -87,15 +87,11 @@ function newsletter__register() {
     $accept = strip_tags($_POST['accept']);
 
     if(!isset($email)) {
-
         wp_send_json(['message' => __('Error invalid email', 'wpduf')], 200);
-
     }
 
     if(!isset($accept)) {
-
         wp_send_json(['message' => __('Debes aceptar las condiciones', 'wpduf'),'status' =>'error'], 500);
-
     }
 
     if(!is_email($email)) {
@@ -104,7 +100,6 @@ function newsletter__register() {
 
     if(get_option('os_register_pods')) {
         $podsNewsletterRepository = new PodsNewsletterRepository();
-
 
         if(!is_email($email)) {
             wp_send_json(['message' => __('Error') , 'status' =>'error'], 200);
@@ -129,5 +124,4 @@ function newsletter__register() {
     }
 
     wp_send_json(['message' => __('User in list'),'status' =>'error'],200);
-
 }
