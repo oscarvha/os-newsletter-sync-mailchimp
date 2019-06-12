@@ -1,0 +1,1 @@
+# os-newsletter-sync-mailchimp

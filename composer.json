@@ -1,0 +1,13 @@
+{
+    "name": "oscar/os-newsletter-sync-mailchimp",
+    "description": "Plugin WP sincronice newsletter with pods and mailchimp",
+    "authors": [
+        {
+            "name": "Oscar Sanchez",
+            "email": "oscar@bitmarketing.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.3"
+    }
+}
