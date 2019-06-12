@@ -83,31 +83,47 @@ function os_newsletter_options() {
  */
 function newsletter__register() {
 
-    if(!isset($_POST['email'])) {
+    $email = strip_tags($_POST['email']);
+    $accept = strip_tags($_POST['accept']);
+
+    if(!isset($email)) {
 
         wp_send_json(['message' => __('Error invalid email', 'wpduf')], 200);
 
     }
 
-    if(!isset($_POST['accept'])) {
+    if(!isset($accept)) {
 
-        wp_send_json(['message' => __('Debes aceptar las condiciones', 'wpduf'),'status' =>'error'], 200);
+        wp_send_json(['message' => __('Debes aceptar las condiciones', 'wpduf'),'status' =>'error'], 500);
 
+    }
+
+    if(!is_email($email)) {
+        wp_send_json(['message' => __('Error') , 'status' =>'error'], 200);
     }
 
     if(get_option('os_register_pods')) {
         $podsNewsletterRepository = new PodsNewsletterRepository();
 
-        if($podsNewsletterRepository->existSubscriber($_POST['email'])) {
+
+        if(!is_email($email)) {
+            wp_send_json(['message' => __('Error') , 'status' =>'error'], 200);
+        }
+        if($podsNewsletterRepository->existSubscriber($email)) {
 
             wp_send_json(['message' => __('Email is in List Subscriber') , 'status' =>'error'], 200);
         }
-        $podsNewsletterRepository->addSubscriber($_POST['email']);
+
+        if($podsNewsletterRepository->existSubscriber($accept)) {
+
+            wp_send_json(['message' => __('You need accept the terms') , 'status' =>'error'], 200);
+        }
+        $podsNewsletterRepository->addSubscriber($email);
     }
 
     $mailChimpIntegration = new MailChimpIntegration(get_option('os_mailchimp_list'), get_option('os_mailchimp_dg'),get_option('os_mailchimp_api'));
 
-    if($mailChimpIntegration->addSubscriber($_POST['email'])) {
+    if($mailChimpIntegration->addSubscriber($email)) {
 
         wp_send_json(['message' => __('User add correctly'),'status' =>'ok'],200);
     }
