@@ -104,11 +104,7 @@ function newsletter__register() {
         if(!is_email($email)) {
             wp_send_json(['message' => __('Error') , 'status' =>'error'], 200);
         }
-        if($podsNewsletterRepository->existSubscriber($email)) {
-
-            wp_send_json(['message' => __('Email is in List Subscriber') , 'status' =>'error'], 200);
-        }
-
+        
         if($podsNewsletterRepository->existSubscriber($accept)) {
 
             wp_send_json(['message' => __('You need accept the terms') , 'status' =>'error'], 200);
