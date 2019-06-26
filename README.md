@@ -7,13 +7,15 @@ Install in your WP
 Insert your api key and list in admin menu
 
 ## Usage
-Insert in your theme 
 
-```php
-```
+##Create pods options grupo with this
+options: recaptcha_site_key and recaptcha_secret_key
+
+Insert in your theme 
 Form newsletter
 
 ```html
+<script src="https://www.google.com/recaptcha/api.js?render=<?php echo getPodOptions('options','recaptcha_site_key') ?>"></script>
 <div class="newsletter__wrapper" style='background-image:  url("wp-content/themes/sahara/images/newsletter2.jpeg")'>
     <h3 class="title-block title-block--light title-block--tiny"> <?php _e( 'Subscribete a nuestra newsletter', 'twentysixteen' ); ?></h3>
     <section class="newsletter__content">
@@ -51,25 +53,39 @@ Form newsletter
 </div>
 
 <script>
-  $("#newsletter").submit(function(event){
-    event.preventDefault(); //prevent default action
-    var post_url = '/wp-admin/admin-ajax.php'; //get form action url
-    var request_method = $(this).attr("method"); //get form GET/POST method
-    var form_data = $(this).serialize(); //Encode form elements for submission
+ $("#newsletter").submit(function(event){
+    event.preventDefault();
+    var post_url = '/wp-admin/admin-ajax.php';
+    var request_method = $(this).attr("method");
+    var form = $(this);
+    var site_key = $('#recaptcha-site').val();
+    
+    grecaptcha.ready(function() {
+      grecaptcha.execute(site_key, {action: 'create_newsletter'}).then(function(token) {
+        // add token to form
+        $('#newsletter_form').prepend('<input type="hidden" name="g-recaptcha-response" value="' + token + '">');
 
-    $.ajax({
-      url: post_url,
-      type: request_method,
-      data: form_data,
-    }).done(function(response){ //
-      $('.js-newsletter__message').html(response.message);
-      $('.js-newsletter__message').removeClass('error');
-      $('.js-newsletter__message').removeClass('success');
-      if(response.status === 'ok') {
-        $('.js-newsletter__message').removeClass('success');
-      } else {
-        $('.js-newsletter__message').addClass('error');
-      }
+        var form_data = form.serialize();
+        form_data = form_data+'&token='+token;
+        ;
+        $.ajax({
+          url: post_url,
+          type: request_method,
+          data: form_data,
+          captcha: token,
+          mierdaVIda: 'test'
+        }).done(function(response){ //
+          $('.js-newsletter__message').html(response.message);
+          $('.js-newsletter__message').removeClass('error');
+          $('.js-newsletter__message').removeClass('success');
+          if(response.status === 'ok') {
+            $('.js-newsletter__message').addClass('success');
+          } else {
+            $('.js-newsletter__message').addClass('error');
+          }
+        });
+
+      });;
     });
   });
 </script>
