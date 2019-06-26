@@ -4,7 +4,6 @@
 class RecaptchaValidate
 {
     const URL_VERIFY = "https://www.google.com/recaptcha/api/siteverify";
-    const SECRET_KEY = "6Lca06oUAAAAAHGc1pPjNRoH69S4GHaykeePFBmh";
 
     /**
      * @var string
