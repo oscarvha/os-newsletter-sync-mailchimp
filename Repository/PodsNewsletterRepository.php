@@ -41,4 +41,10 @@ class PodsNewsletterRepository
 
     }
 
+    public static function getOptionByNameGroupAndField(string $group,string $field)
+    {
+       $podsRepository =  pods( $group );
+       return $podsRepository->field( $field );
+    }
+
 }

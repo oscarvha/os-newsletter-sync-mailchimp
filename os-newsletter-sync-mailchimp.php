@@ -16,6 +16,7 @@
 
 include "Repository/PodsNewsletterRepository.php";
 include "Model/MailChimpIntegration.php";
+include "Util/RecaptchaValidate.php";
 
 add_action('wp_ajax_nopriv_newsletter__register', 'newsletter__register');
 add_action('wp_ajax_newsletter__register', 'newsletter__register');
@@ -85,6 +86,8 @@ function newsletter__register() {
 
     $email = strip_tags($_POST['email']);
     $accept = strip_tags($_POST['accept']);
+    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING);
+
 
     if(!isset($email)) {
         wp_send_json(['message' => __('Error invalid email', 'wpduf')], 200);
@@ -98,16 +101,27 @@ function newsletter__register() {
         wp_send_json(['message' => __('Error') , 'status' =>'error'], 200);
     }
 
+    if(!isset($token)) {
+        wp_send_json(['message' => __('Error en el captcha', 'wpduf'),'status' =>'error'], 500);
+    }
+
+    $secretKey = getPodOptionsNewsletter('options','recaptcha_secret_key');
+
+    $recaptchaValidate = new RecaptchaValidate($secretKey,$token);
+    if(!$recaptchaValidate->validateCaptcha()){
+        wp_send_json(['message' => __('Error en el captcha', 'wpduf'),'status' =>'error'], 500);
+    }
+
     if(get_option('os_register_pods')) {
         $podsNewsletterRepository = new PodsNewsletterRepository();
 
         if(!is_email($email)) {
             wp_send_json(['message' => __('Error') , 'status' =>'error'], 200);
         }
-        
-        if($podsNewsletterRepository->existSubscriber($accept)) {
 
-            wp_send_json(['message' => __('You need accept the terms') , 'status' =>'error'], 200);
+        if($podsNewsletterRepository->existSubscriber($email)) {
+
+            wp_send_json(['message' => __('Ya estas registrado') , 'status' =>'error'], 200);
         }
         $podsNewsletterRepository->addSubscriber($email);
     }
@@ -121,3 +135,8 @@ function newsletter__register() {
 
     wp_send_json(['message' => __('User in list'),'status' =>'error'],200);
 }
+function getPodOptionsNewsletter($optionsGroup , $option)
+{
+   return PodsNewsletterRepository::getOptionByNameGroupAndField($optionsGroup,$option);
+}
+
