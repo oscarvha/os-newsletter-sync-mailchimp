@@ -36,7 +36,7 @@ Form newsletter
                     <label for="squaredOne"></label>
                 </div>
                 <div class="newsletter-accept">
-                    <a class="link--light" href="http://floresdecon.com/es/content/2-aviso-legal" target="_blank">
+                    <a class="link--light" href="" target="_blank">
                         <?php _e( 'Acepto la política de privacidad', 'twentysixteen' ); ?>
                     </a>
                 </div>
